@@ -1,35 +1,4 @@
 #!/bin/bash
-#
-# FFmpeg-Android, a bash script to build FFmpeg for Android.
-#
-# Copyright (c) 2012 Cedric Fung <root@vec.io>
-#
-# FFmpeg-Android will build FFmpeg for Android automatically,
-# with patches from VPlayer's Android version <https://vplayer.net/>.
-#
-# FFmpeg-Android is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either
-# version 3 of the License, or (at your option) any later version.
-
-# FFmpeg-Android is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-
-# You should have received a copy of the GNU Lesser General Public
-# License along with FFmpeg-Android; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-#
-#
-# Instruction:
-#
-# 0. Install git and Android ndk
-# 1. $ export ANDROID_NDK=/path/to/your/android-ndk
-# 2. $ ./FFmpeg-Android.sh
-# 3. libffmpeg.so will be built to build/ffmpeg/{neon,armv7,vfp,armv6}/
-#
-#
 
 DEST=`pwd`/build/ffmpeg && rm -rf $DEST
 SOURCE=`pwd`/ffmpeg
@@ -81,17 +50,20 @@ FFMPEG_FLAGS="--target-os=linux \
   --disable-avfilter \
   --disable-encoders \
   --disable-muxers \
-  --disable-bsfs \
   --disable-filters \
   --disable-devices \
   --disable-everything \
   --enable-protocols  \
   --enable-parsers \
   --enable-demuxers \
-  --disable-demuxer=sbg \
   --enable-decoders \
+  --enable-bsfs \
   --enable-network \
   --enable-swscale  \
+  --disable-demuxer=sbg \
+  --disable-demuxer=dts \
+  --disable-parser=dca \
+  --disable-decoder=dca \
   --enable-asm \
   --enable-version3"
 
@@ -141,4 +113,3 @@ for version in neon armv7 vfp armv6; do
   arm-linux-androideabi-strip --strip-unneeded $PREFIX/libffmpeg.so
 
 done
-
