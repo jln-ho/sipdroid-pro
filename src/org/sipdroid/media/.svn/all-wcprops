@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/634/trunk/src/org/sipdroid/media
+END
+RtpStreamSender.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/624/trunk/src/org/sipdroid/media/RtpStreamSender.java
+END
+Bluetooth.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/574/trunk/src/org/sipdroid/media/Bluetooth.java
+END
+RtpStreamReceiver.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/634/trunk/src/org/sipdroid/media/RtpStreamReceiver.java
+END
+WavWriter.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/611/trunk/src/org/sipdroid/media/WavWriter.java
+END
+JAudioLauncher.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/608/trunk/src/org/sipdroid/media/JAudioLauncher.java
+END
+CallRecorder.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/610/trunk/src/org/sipdroid/media/CallRecorder.java
+END
+MediaLauncher.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/553/trunk/src/org/sipdroid/media/MediaLauncher.java
+END
