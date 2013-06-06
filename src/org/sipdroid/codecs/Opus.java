@@ -254,6 +254,7 @@ public class Opus extends CodecBase implements Codec {
 	
 	public void close(){
 		CODEC_NUMBER_OVERRIDE = 0;
+		cleanup();
 	}
 	
 	public static FrameSizeMs getFrameSize(int size){
@@ -271,8 +272,9 @@ public class Opus extends CodecBase implements Codec {
 			default : return Mode.AUDIO;
 		}	
 	}
- 
+	
 	public native int open(int samplerate, int mode, int framesize, int maxBitRate, boolean fec, boolean dtx, boolean cbr);
 	public native int decode(byte encoded[], short lin[], int size);
 	public native int encode(short lin[], int offset, byte encoded[], int size);
+	public native void cleanup();
 }

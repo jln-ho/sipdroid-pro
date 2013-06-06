@@ -83,8 +83,6 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "could not initialize encoder: unsupported frame size: %d (%f ms)", framesize, ms);
 		return -1;
 	}
-	if(enc != 0) opus_decoder_destroy(dec);
-	if(dec != 0) opus_encoder_destroy(enc);
 	int error;
 
 	// apply configuration values
@@ -178,16 +176,22 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_decode
 }
 
 extern "C"
-JNIEXPORT void JNICALL Java_org_sipdroid_codecs_Opus_close
+JNIEXPORT void JNICALL Java_org_sipdroid_codecs_Opus_cleanup
 	(JNIEnv *env, jobject obj) {
 	if(mutexes_initialized){
 		pthread_mutex_lock(&dec_lock);
-		opus_decoder_destroy(dec);
-		dec = NULL;
+		if(dec != NULL){
+			opus_decoder_destroy(dec);
+			dec = NULL;
+		}
 		pthread_mutex_unlock(&dec_lock);
+
 		pthread_mutex_lock(&enc_lock);
-		opus_encoder_destroy(enc);
-		enc = NULL;
+		if(enc != NULL){
+			opus_encoder_destroy(enc);
+			enc = NULL;
+		}
 		pthread_mutex_unlock(&enc_lock);
+		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "cleanup complete");
 	}
 }
