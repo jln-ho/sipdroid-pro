@@ -8,7 +8,7 @@ AAC support was implemented using the [Fraunhofer FDK AAC library](http://www.ii
 Opus support was implemented using [libopus v1.0.1](http://www.opus-codec.org)
 
 The basis for the file streaming extension was taken from [extended-sipdroid](https://github.com/codevise/extended-sipdroid) and was further extended to support .wav, .aac and .mp4 files in addition to .mp3 files.
-This extension can be accessed through the newly added _file controls_ button obove the in-call dialpad
+This extension can be accessed through the newly added _file controls_ button above the in-call dialpad
 
 INSTALLATION
 ============
