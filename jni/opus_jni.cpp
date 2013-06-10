@@ -129,69 +129,67 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 extern "C"
 JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_encode
     (JNIEnv *env, jobject obj, jshortArray lin, jint offset, jbyteArray encoded, jint size) {
+	int out_bytes = 0;
 	pthread_mutex_lock(&enc_lock);
 	if(enc != NULL){
 		opus_int16* enc_in_buf = (opus_int16*) malloc(sizeof(opus_int16*)*size);
 		env->GetShortArrayRegion(lin, offset, size, enc_in_buf);
 		unsigned char* enc_out_buf = (unsigned char*) malloc(4000);
-		int out_bytes = opus_encode(enc, enc_in_buf, frame_size, enc_out_buf, 4000);
+		out_bytes = opus_encode(enc, enc_in_buf, frame_size, enc_out_buf, 4000);
 		if(out_bytes <= 1){
-			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "error encoding frame");
-			pthread_mutex_unlock(&enc_lock);
-			return -1;
+			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "error encoding frame. code %d", out_bytes);
+			out_bytes = 0;
 		}
-		env->SetByteArrayRegion(encoded, RTP_HDR_SIZE, out_bytes, (jbyte*) enc_out_buf);
+		else{
+			env->SetByteArrayRegion(encoded, RTP_HDR_SIZE, out_bytes, (jbyte*) enc_out_buf);
+		}
 		free(enc_in_buf);
 		free(enc_out_buf);
-		pthread_mutex_unlock(&enc_lock);
-		return out_bytes;
 	}
 	pthread_mutex_unlock(&enc_lock);
-	return 0;
+	return out_bytes;
 }
 
 extern "C"
 JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_decode
     (JNIEnv *env, jobject obj, jbyteArray encoded, jshortArray lin, jint size) {
+	int out_samples = 0;
 	pthread_mutex_lock(&dec_lock);
 	if(dec != NULL){
 		unsigned char* dec_in_buf = (unsigned char*) malloc(size);
 		env->GetByteArrayRegion(encoded, RTP_HDR_SIZE, size, (jbyte*) dec_in_buf);
 		opus_int16* dec_out_buf = (opus_int16*) malloc(sizeof(opus_int16*)*MAX_OUT_SAMPLES);
-		int out_samples = opus_decode(dec, dec_in_buf, size, dec_out_buf, MAX_OUT_SAMPLES, 0);
+		out_samples = opus_decode(dec, dec_in_buf, size, dec_out_buf, MAX_OUT_SAMPLES, 0);
 		if(out_samples <= 0){
 			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "error decoding frame. code %d", out_samples);
-			pthread_mutex_unlock(&dec_lock);
-			return 0;
+			out_samples = 0;
 		}
-		env->SetShortArrayRegion(lin, 0, out_samples, dec_out_buf);
+		else{
+			env->SetShortArrayRegion(lin, 0, out_samples, dec_out_buf);
+		}
 		free(dec_in_buf);
 		free(dec_out_buf);
-
-		pthread_mutex_unlock(&dec_lock);
-		return out_samples;
 	}
 	pthread_mutex_unlock(&dec_lock);
-	return 0;
+	return out_samples;
 }
 
 extern "C"
 JNIEXPORT void JNICALL Java_org_sipdroid_codecs_Opus_cleanup
 	(JNIEnv *env, jobject obj) {
 	if(mutexes_initialized){
-		pthread_mutex_lock(&dec_lock);
-		if(dec != NULL){
+		if(dec){
+			pthread_mutex_lock(&dec_lock);
 			opus_decoder_destroy(dec);
 			dec = NULL;
+			pthread_mutex_unlock(&dec_lock);
 		}
-		pthread_mutex_unlock(&dec_lock);
-
-		pthread_mutex_lock(&enc_lock);
-		if(enc != NULL){
+		if(enc){
+			pthread_mutex_lock(&enc_lock);
 			opus_encoder_destroy(enc);
 			enc = NULL;
+			pthread_mutex_unlock(&enc_lock);
 		}
-		pthread_mutex_unlock(&enc_lock);
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "cleanup complete");
 	}
 }

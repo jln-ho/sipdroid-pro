@@ -53,7 +53,7 @@ bool mutexes_initialized = false;
 #define AU_HDR_SIZE 	4
 #define TOTAL_HDR_SIZE 	RTP_HDR_SIZE + AU_HDR_SIZE
 
-bool open_error;
+bool open_error = true;
 int codec_samplerate = -1;
 int codec_bitrate = -1;
 int channels = 1;
@@ -127,13 +127,11 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_open (JNIEnv *env, jobject o
 		case AOT_ER_AAC_LD: codec_aot = AOT_ER_AAC_LD; break;
 		case AOT_ER_AAC_ELD: codec_aot = AOT_ER_AAC_ELD; break;
 		default: __android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unsupported AOT: %d", aot);
-		open_error = true;
 		return -1;
 	}
 	// open encoder
 	if (aacEncOpen(&enc_handle, 0, 1) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to open encoder");
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "encoder opened");
@@ -141,7 +139,6 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_open (JNIEnv *env, jobject o
 	if (codec_aot == 39 && codec_eld_sbr) {
 		if (aacEncoder_SetParam(enc_handle, AACENC_SBR_MODE, 1) != AACENC_OK) {
 			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to set SBR for ELD", aot);
-			open_error = true;
 			return -1;
 		}
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "AOT is 39, SBR is enabled", aot);
@@ -149,55 +146,47 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_open (JNIEnv *env, jobject o
 	// set AOT (HE-AACv1, HE-AACv2, AAC-LC, AAC-LD or AAC-ELD)
 	if (aacEncoder_SetParam(enc_handle, AACENC_AOT, codec_aot) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to set the AOT to %d", codec_aot);
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "AOT: %d", aot);
 	// set the samplerate
 	if (aacEncoder_SetParam(enc_handle, AACENC_SAMPLERATE, codec_samplerate) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to set the samplerate to %d", codec_samplerate);
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "samplerate: %d", codec_samplerate);
 	// set channel mode
 	if (aacEncoder_SetParam(enc_handle, AACENC_CHANNELMODE, channels) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to set the channelmode to %d", channels);
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "channelmode: %d", channels);
 	// set bitrate
 	if (aacEncoder_SetParam(enc_handle, AACENC_BITRATE, codec_bitrate) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to set the bitrate to %d", codec_bitrate);
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "bitrate: %d", brate);
 	// set transport type
 	if (aacEncoder_SetParam(enc_handle, AACENC_TRANSMUX, TT_MP4_RAW) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to set AACENC_TRANSMUX to raw");
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "transport type: raw access units");
 	// enable afterburner for better sound quality
 	if (aacEncoder_SetParam(enc_handle, AACENC_AFTERBURNER, afterburner) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to enable afterburner");
-		open_error = true;
 		return -1;
 	}
 	if(afterburner) __android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "afterburner enabled");
 	// enable encoder
 	if (aacEncEncode(enc_handle, NULL, NULL, NULL, NULL) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to initialize the encoder");
-		open_error = true;
 		return -1;
 	}
 	// get encoder info
 	if (aacEncInfo(enc_handle, &enc_info) != AACENC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "unable to get encoder info");
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "frameLength: %d", enc_info.frameLength);
@@ -233,7 +222,6 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_open (JNIEnv *env, jobject o
 	dec_err = aacDecoder_ConfigRaw(dec_handle, &asc_buf_pt, &asc_buf_size);
 	if(dec_err != AAC_DEC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "error writing ASC. AAC_DECODER_ERROR %x", dec_err);
-		open_error = true;
 		return -1;
 	}
 	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "decoder sampleRate: %d", aacDecoder_GetStreamInfo(dec_handle)->aacSampleRate);
@@ -249,13 +237,11 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_open (JNIEnv *env, jobject o
 
 	if (aacDecoder_SetParam(dec_handle, AAC_PCM_OUTPUT_CHANNELS, 1) != AAC_DEC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "unable to set number of pcm output channels");
-		open_error = true;
 		return -1;
 	}
 
 	if (aacDecoder_SetParam(dec_handle, AAC_PCM_OUTPUT_INTERLEAVED, 0) != AAC_DEC_OK) {
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "unable to set number of interleaving to 0");
-		open_error = true;
 		return -1;
 	}
 
@@ -265,6 +251,7 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_open (JNIEnv *env, jobject o
 
 extern "C"
 JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_encode (JNIEnv *env, jobject obj, jshortArray lin, jint offset, jbyteArray encoded, jint size) {
+	int out_bytes = 0;
 	pthread_mutex_lock(&enc_lock);
 	if(enc_handle != NULL) {
 		// pointers to encoder's in/out buffers
@@ -279,29 +266,29 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_encode (JNIEnv *env, jobject
 		// encode frame
 		if ((enc_err = aacEncEncode(enc_handle, &enc_in_bufdesc, &enc_out_bufdesc, &enc_in_args, &enc_out_args)) != AACENC_OK) {
 			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "encoding failed AAC_ENCODER_ERROR %x", enc_err);
-			pthread_mutex_unlock(&enc_lock);
-			return 0;
 		}
-		// set AU header
-		uint16_t au_size = (uint16_t) enc_out_args.numOutBytes;
-		// first 8 of 13 bits for AU-size
-		enc_au_header[2] = (jbyte) ((au_size << 3) >> 8);
-		// last 5 of 13 bits for AU-size + 3 bits for AU-Index (always 0, see RFC 3640)
-		enc_au_header[3] = (jbyte) ((au_size << 11) >> 8);
-		// write AU header
-		env->SetByteArrayRegion(encoded, RTP_HDR_SIZE, AU_HDR_SIZE, enc_au_header);
-		// write AU (frame)
-		env->SetByteArrayRegion(encoded, TOTAL_HDR_SIZE, au_size, enc_out_buf);
+		else {
+			// set AU header
+			uint16_t au_size = (uint16_t) enc_out_args.numOutBytes;
+			// first 8 of 13 bits for AU-size
+			enc_au_header[2] = (jbyte) ((au_size << 3) >> 8);
+			// last 5 of 13 bits for AU-size + 3 bits for AU-Index (always 0, see RFC 3640)
+			enc_au_header[3] = (jbyte) ((au_size << 11) >> 8);
+			// write AU header
+			env->SetByteArrayRegion(encoded, RTP_HDR_SIZE, AU_HDR_SIZE, enc_au_header);
+			// write AU (frame)
+			env->SetByteArrayRegion(encoded, TOTAL_HDR_SIZE, au_size, enc_out_buf);
 
-		pthread_mutex_unlock(&enc_lock);
-		return AU_HDR_SIZE + au_size;
+			out_bytes = AU_HDR_SIZE + au_size;
+		}
 	}
 	pthread_mutex_unlock(&enc_lock);
-	return 0;
+	return out_bytes;
 }
 
 extern "C"
 JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_decode (JNIEnv *env, jobject obj, jbyteArray encoded, jshortArray lin, jint size) {
+	int out_samples = 0;
 	pthread_mutex_lock(&dec_lock);
 	if(dec_handle != NULL) {
 		// get AU size
@@ -310,10 +297,12 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_decode (JNIEnv *env, jobject
 		au_size = (UINT) (dec_au_header[2] << 8);
 		au_size |= (UINT) dec_au_header[3];
 		au_size >>= 3;
+
 		// fill external input buffer
 		UCHAR dec_in_buf[au_size];
 		UCHAR* dec_in_buf_pt = dec_in_buf;
 		env->GetByteArrayRegion(encoded, TOTAL_HDR_SIZE , au_size, (jbyte*) dec_in_buf);
+
 		// fill internal input buffer
 		UINT bytes_valid = au_size;
 		while(bytes_valid != 0) {
@@ -328,40 +317,34 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_decode (JNIEnv *env, jobject
 		INT_PCM dec_out_buf[sizeof(INT_PCM)*dec_out_buf_size];
 		if((dec_err = aacDecoder_DecodeFrame(dec_handle, dec_out_buf, dec_out_buf_size, 0)) != AAC_DEC_OK) {
 			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "error decoding frame. AAC_DECODER_ERROR %x", dec_err);
-			pthread_mutex_unlock(&dec_lock);
-			return 0;
 		}
-		// write PCM
-		int pcm_frame_size = aacDecoder_GetStreamInfo(dec_handle)->frameSize;
-		env->SetShortArrayRegion(lin, 0, pcm_frame_size, (jshort*) dec_out_buf);
-		//aacDecoder_SetParam(dec_handle, AAC_TPDEC_CLEAR_BUFFER, 1);
-
-		pthread_mutex_unlock(&dec_lock);
-		return pcm_frame_size;
+		else {
+			// write PCM
+			out_samples = aacDecoder_GetStreamInfo(dec_handle)->frameSize;
+			env->SetShortArrayRegion(lin, 0, out_samples, (jshort*) dec_out_buf);
+			//aacDecoder_SetParam(dec_handle, AAC_TPDEC_CLEAR_BUFFER, 1);
+		}
 	}
 	pthread_mutex_unlock(&dec_lock);
-	return 0;
+	return out_samples;
 }
 
 extern "C"
 JNIEXPORT void JNICALL Java_org_sipdroid_codecs_AAC_close
 (JNIEnv *env, jobject obj) {
 	if(mutexes_initialized) {
-		pthread_mutex_lock(&enc_lock);
-		if(enc_handle != NULL) {
+		if(enc_handle) {
+			pthread_mutex_lock(&enc_lock);
 			aacEncClose(&enc_handle);
 			enc_handle = NULL;
+			pthread_mutex_unlock(&enc_lock);
 		}
-		pthread_mutex_unlock(&enc_lock);
-
-		pthread_mutex_lock(&dec_lock);
-		if(dec_handle != NULL) {
+		if(dec_handle) {
+			pthread_mutex_lock(&dec_lock);
 			aacDecoder_Close(dec_handle);
 			dec_handle = NULL;
+			pthread_mutex_unlock(&dec_lock);
 		}
-		pthread_mutex_unlock(&dec_lock);
-
-		mutexes_initialized = false;
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "cleanup complete");
 	}
 }
