@@ -1,4 +1,4 @@
-APP_PROJECT_PATH := $(call my-dir)/..
+APP_PROJECT_PATH := $(call my-dir)
 
 APP_MODULES  := OSNetworkSystem
 #APP_MODULES	 += speex_jni
@@ -10,7 +10,7 @@ APP_MODULES  := OSNetworkSystem
 #APP_MODULES	 += silk24_jni
 
 APP_MODULES	 += g722_jni
-APP_MODULES	 += gsm_jni
+#APP_MODULES	 += gsm_jni
 APP_MODULES	 += libFraunhoferAAC
 APP_MODULES  += aac_jni
 APP_MODULES += aac_file_jni
