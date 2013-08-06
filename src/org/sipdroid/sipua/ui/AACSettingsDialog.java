@@ -24,17 +24,17 @@ import android.widget.Toast;
  * A Dialog that enables the user to configure the AAC codec
  * @author Julian Howes
  */
+
 public class AACSettingsDialog extends Dialog {
-	
 	private Spinner sp_aac_profile;
 	private Spinner sp_aac_bitrate;
 	private Spinner sp_aac_samprate;
 	private CheckBox cb_eld_sbr;
 	private TableRow tr_eld_sbr;
 	
-	public AACSettingsDialog(final Context context) {
+	public AACSettingsDialog(final Context context, final OnCodecSelectionListener listener) {
 		super(context);
-		setTitle("AAC CODEC SETTINGS");
+		setTitle(R.string.aac_codec_settings);
 		setContentView(R.layout.aac_settings_dialog);
 		
 		// reference views
@@ -76,24 +76,20 @@ public class AACSettingsDialog extends Dialog {
 								tr_eld_sbr.getVisibility() == View.VISIBLE && cb_eld_sbr.isChecked());
 					}
 					catch (InvalidParameterException e){
-						Toast.makeText(getContext(), "ERROR: unsupported combination", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getContext(), R.string.codec_error_combination, Toast.LENGTH_SHORT).show();
 						return;
 					}
 					aac.init();
 					if(!aac.isFailed()){
-						Toast.makeText(getContext(), "settings applied", Toast.LENGTH_SHORT).show();
-						Codecs.put(aac);
-						SharedPreferences sharedPrefs = context.getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
-						sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_AAC_BITRATE, aac.getBitrate()).commit();
-						sharedPrefs.edit().putString(Sipdroid.ADDITIONAL_PREF_AAC_PROFILE, aac.getConfig()).commit();
+						listener.onCodecSelected(aac);
 						dismiss();
 					}
 					else{
-						Toast.makeText(getContext(), "ERROR: unsupported combination", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getContext(), R.string.codec_error_combination, Toast.LENGTH_SHORT).show();
 					}
 				}
 				else{
-					Toast.makeText(getContext(), "ERROR: unsupported sampling rate", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getContext(), R.string.codec_error_samplingrate, Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -102,6 +98,7 @@ public class AACSettingsDialog extends Dialog {
 		findViewById(R.id.btn_aac_cancel).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				listener.onCodecSelected(null);
 				dismiss();
 			}
 		});
@@ -166,5 +163,4 @@ public class AACSettingsDialog extends Dialog {
 		if(selected.equals("AAC-LD")) return AAC.AOT_AAC_LD;
 		return AAC.AOT_AAC_ELD;
 	}
-	
 }

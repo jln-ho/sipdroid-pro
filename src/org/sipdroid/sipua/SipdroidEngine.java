@@ -44,6 +44,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class SipdroidEngine implements RegisterAgentListener {
 
@@ -529,7 +530,6 @@ public class SipdroidEngine implements RegisterAgentListener {
 	public boolean call(String target_url,boolean force) {
 		int p = pref;
 		boolean found = false;
-		
 		if (isRegistered(p) && Receiver.isFast(p))
 			found = true;
 		else {

@@ -65,6 +65,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import org.sipdroid.codecs.Codecs;
 import org.sipdroid.media.Bluetooth;
 import org.sipdroid.media.RtpStreamReceiver;
 import org.sipdroid.media.RtpStreamSender;
@@ -243,6 +244,7 @@ import org.zoolu.sip.provider.SipProvider;
 					ccConn.log(ccCall.base);
 					ccConn.date = 0;
 					engine(mContext).listen();
+					Codecs.revert();
 					break;
 				case UserAgent.UA_STATE_INCALL:
 					broadcastCallStateChanged("OFFHOOK", null);

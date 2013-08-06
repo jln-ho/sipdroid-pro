@@ -217,6 +217,13 @@
         <item>12 kHz</item>
         <item>8 kHz</item>
     </string-array>
+    <string-array name="codecs">
+        <item>-</item>
+        <item>AAC</item>
+        <item>Opus</item>
+        <item>G.722</item>
+        <item>G.711</item>
+    </string-array>
 <string name="settings_auto_on">Auto-Answer in use</string>
 <string name="settings_auto_on2">Short vibrating alert when screen is on</string>
 <string name="settings_auto_ondemand">Auto-Answer on demand</string>
@@ -362,5 +369,42 @@
 
 <string name="aac_settings">AAC Settings</string>
 <string name="opus_settings">Opus Settings</string>
+
+<string name="enter_uri">Enter a contact\'s SIP URI:</string>
+<string name="select_codec">Select a codec:</string>
+
+<string name="apply">Apply</string>
+<string name="cancel">Cancel</string>
+
+<string name="error_speaker_title">Could not enable speaker</string>
+<string name="error_speaker_description">Routing the output to the speaker is only possible at sampling rates of 44.1 kHz or below</string>
+
+<string name="aac_codec_settings">AAC CODEC SETTINGS</string>
+<string name="opus_codec_settings">OPUS CODEC SETTINGS</string>
+<string name="codec_error_combination">ERROR: unsupported combination</string>
+<string name="codec_error_samplingrate">ERROR: unsupported sampling rate</string>
+
+<string name="aac_profile">AAC PROFILE </string>
+<string name="profile">PROFILE </string>
+<string name="frame_length">FRAME LENGTH </string>
+
+<string name="codec_dialog_codec">Codec:\t\t\t\t</string>
+<string name="codec_dialog_samplerate">Samplerate:\t\t</string>
+<string name="codec_dialog_bitrate">Bitrate:\t\t\t\t</string>
+<string name="codec_dialog_profile">Profile:\t\t\t\t</string>
+
+<string name="codec_dialog_use">Would you like to use the following preset?\n\n</string>
+
+<string name="create_preset_title">Create preset?</string>
+<string name="create_preset_description">Would you like to create the following preset?\n\n</string>
+<string name="create_preset_sucess">Preset created! </string>
+
+<string name="enter_uri_reminder">Please enter a SIP URI or contact name </string>
+
+<string name="delete_preset_title">Delete preset?</string>
+<string name="delete_preset_description">Are you sure you want to delete the following preset?\n\n</string>
+<string name="delete_preset_sucess">Preset deleted! </string>
+
+<string name="codec_presets">Codec presets</string>
 
 </resources>

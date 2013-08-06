@@ -22,17 +22,17 @@ public class OpusSettingsDialog extends Dialog {
 	private Spinner sp_opus_profile;
 	private Spinner sp_opus_framelength;
 	private Spinner sp_opus_samprate;
-	
-	public OpusSettingsDialog(final Context context) {
+	 
+	public OpusSettingsDialog(final Context context, final OnCodecSelectionListener listener) {
 		super(context);
-		setTitle("OPUS CODEC SETTINGS");
+		setTitle(R.string.opus_codec_settings);
 		setContentView(R.layout.opus_settings_dialog);
 		
 		// reference views
 		sp_opus_profile = (Spinner) findViewById(R.id.sp_opus_profile);
 		sp_opus_framelength = (Spinner) findViewById(R.id.sp_opus_framelength);
 		sp_opus_samprate = (Spinner) findViewById(R.id.sp_opus_samprate);
-		
+		 
 		// initialize views according to the current configuration
 		setCurrentValues();
 		
@@ -52,20 +52,15 @@ public class OpusSettingsDialog extends Dialog {
 					}
 					opus.init();
 					if(!opus.isFailed()){
-						Toast.makeText(getContext(), "settings applied", Toast.LENGTH_SHORT).show();
-						Codecs.put(opus);
-						SharedPreferences sharedPrefs = context.getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
-						sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_FSIZE, opus.getFrameSizeMsInt()).commit();
-						sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_MODE, opus.getModeInt()).commit();
-						sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_SRATE, opus.samp_rate()).commit();
+						listener.onCodecSelected(opus);
 						dismiss();
 					}
 					else{
-						Toast.makeText(getContext(), "ERROR: unsupported combination", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getContext(), R.string.codec_error_combination, Toast.LENGTH_SHORT).show();
 					}
 				}
 				else{
-					Toast.makeText(getContext(), "ERROR: unsupported sampling rate", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getContext(), R.string.codec_error_samplingrate, Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -73,6 +68,7 @@ public class OpusSettingsDialog extends Dialog {
 		findViewById(R.id.btn_aac_cancel).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				listener.onCodecSelected(null);
 				dismiss();
 			}
 		});

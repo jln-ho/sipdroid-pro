@@ -224,10 +224,64 @@
 
 <string name="help_speakerphone">Sie können die Lautstärkeregler als Sprechtaste verwenden</string>
 
+
+<string name="browse_button">Datei auswählen</string>
+<string name="play_button">Play</string>
+<string name="open_title">Datei öffnen</string>
+<string name="open_button">Ok</string>
+<string name="no_filemanager_installed">Konnte keinen Dateimanager finden. Installieren Sie z.B. &quot;OI File Manager&quot; aus dem Play Store</string>
+<string name="stop_button">Stop</string>
+<string name="only_mp3">Nur .mp3, .wav, .aac oder .m4a Dateien</string>
+<string name="showFileControls_button">Datei-Streaming</string>
+<string name="hideFileControls_button">Zurück</string>
+<string name="mixer">Lautstärke:</string>
+<string name="label_audioFile">Audio-Datei:</string>
+<string name="no_file_selected">Bitte zuerst eine Datei auswählen!</string>
+<string name="mute_mic">Mikrofon aus</string>
+<string name="wiretap">&lt;- Mischverhältnis -&gt;</string>
+<string name="mute_wiretap">Abhören</string>
+<string name="wiretap_rx">Rx</string>
+<string name="wiretap_tx">Tx</string>
+
 <string name="packet_duplication">Paketverdopplung</string>
-<string name="interleaving">Paket-Interleaving</string>
+<string name="interleaving">Interleaving</string>
 
 <string name="aac_settings">AAC Optionen</string>
 <string name="opus_settings">Opus Optionen</string>
+
+<string name="enter_uri">SIP URI der Gegenstelle:</string>
+<string name="select_codec">Codec auswählen:</string>
+
+<string name="error_speaker_title">Lautsprecher konnte nicht eingeschaltet werden</string>
+<string name="error_speaker_description">Der Lautsprecher kann nur bei Abtastraten bis zu 44.1 kHz eingeschaltet werden.</string>
+
+<string name="apply">Anwenden</string>
+<string name="cancel">Abbrechen</string>
+
+<string name="aac_codec_settings">AAC OPTIONEN</string>
+<string name="opus_codec_settings">OPUS OPTIONEN</string>
+<string name="codec_error_combination">FEHLER: Kombination wird nicht unterstützt</string>
+<string name="codec_error_samplingrate">FEHLER: Abtastrate nicht unterstützt</string>
+<string name="aac_profile">AAC PROFIL</string>
+
+<string name="profile">PROFIL </string>
+<string name="frame_length">RAHMENGR. </string>
+
+<string name="codec_dialog_samplerate">Abtastrate:\t\t</string>
+<string name="codec_dialog_profile">Profil:\t\t\t\t</string>
+
+<string name="codec_dialog_use">Möchte Sie die folgende Voreinstellung verwenden?\n\n</string>
+
+<string name="create_preset_title">Voreinstellung speichern?</string>
+<string name="create_preset_description">Wollen Sie die folgende Voreinstellung speichern?\n\n</string>
+<string name="create_preset_sucess">Voreinstellung gespeichert! </string>
+
+<string name="enter_uri_reminder">Bitte SIP URI oder Kontakt-Namen eintragen </string>
+
+<string name="delete_preset_title">Voreinstellung löschen?</string>
+<string name="delete_preset_description">Wollen Sie wirklich die folgende Voreinstellung löschen?\n\n</string>
+<string name="delete_preset_sucess">Voreinstellung gelöscht! </string>
+
+<string name="codec_presets">Codec Voreinstellungen</string>
 
 </resources>

@@ -186,7 +186,7 @@ public class CallScreen extends Activity implements DialogInterface.OnClickListe
     KeyguardManager.KeyguardLock mKeyguardLock;
     boolean enabled;
     
-	void disableKeyguard() {
+    void disableKeyguard() {
     	if (mKeyguardManager == null) {
 	        mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
 	        mKeyguardLock = mKeyguardManager.newKeyguardLock("Sipdroid");

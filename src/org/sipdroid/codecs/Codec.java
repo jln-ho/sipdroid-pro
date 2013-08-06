@@ -20,6 +20,9 @@
 
 package org.sipdroid.codecs;
 
+import java.security.InvalidParameterException;
+import java.util.Hashtable;
+
 import android.preference.ListPreference;
 
 /**
@@ -73,6 +76,7 @@ public interface Codec {
 	 */
 	void init();
 	void update();
+	void force();
 	
 	/**
 	 * Optionally used to free any resources allocated in init
@@ -143,4 +147,7 @@ public interface Codec {
 	 * the codec parameters accordingly.
 	 */
 	void setListPreference(ListPreference l);
+	
+	void configureFromString(String config) throws InvalidParameterException;
+	String getConfigString();
 }

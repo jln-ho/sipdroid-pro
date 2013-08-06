@@ -168,9 +168,7 @@ public class InCallScreen extends CallScreen implements View.OnClickListener, Se
 	
 	void moveBack() {
 		if (Receiver.ccConn != null && !Receiver.ccConn.isIncoming()) {
-			// after an outgoing call don't fall back to the contact
-			// or call log because it is too easy to dial accidentally from there
-	        startActivity(Receiver.createHomeIntent());
+			RestartActivity.doRestart(this);
 		}
 		onStop();
 	}

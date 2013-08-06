@@ -19,6 +19,10 @@
  */
 package org.sipdroid.codecs;
 
+import java.security.InvalidParameterException;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+
 import org.sipdroid.sipua.ui.Receiver;
 
 import android.content.Context;
@@ -35,12 +39,14 @@ class CodecBase implements Preference.OnPreferenceChangeListener {
 	protected int CODEC_SAMPLE_RATE=8000;		// default for most narrow band codecs
 	protected int CODEC_FRAME_SIZE=160;		// default for most narrow band codecs
 	protected String CODEC_DESCRIPTION;
-	protected String CODEC_DEFAULT_SETTING = "never";
+	protected String CODEC_DEFAULT_SETTING = "always";
 
 	private boolean loaded = false,failed = false;
 	private boolean enabled = false;
 	private boolean wlanOnly = false,wlanOr3GOnly = false;
 	private String value;
+	
+	protected Hashtable<String, String> KV = new Hashtable<String, String>();
 
 	public void update() {
 		if (value == null) {
@@ -50,8 +56,13 @@ class CodecBase implements Preference.OnPreferenceChangeListener {
 		if (Receiver.mContext != null) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(Receiver.mContext);
 			value = sp.getString(key(), CODEC_DEFAULT_SETTING);
-			updateFlags(value);		
+			updateFlags(value);
 		}
+	}
+	
+	public void force(){
+		value = "always";
+		updateFlags(value);
 	}
 	
 	public String getValue() {
@@ -175,5 +186,35 @@ class CodecBase implements Preference.OnPreferenceChangeListener {
 
 	public String toString() {
 		return "CODEC{ " + CODEC_NUMBER + ": " + getTitle() + "}";
+	}
+	
+	public void configureFromString(String config) throws InvalidParameterException{
+		KV.clear();
+		StringTokenizer strTok = new StringTokenizer(config, ";");
+		while (strTok.hasMoreTokens()) {
+			String currToken = strTok.nextToken();
+			if (currToken.contains(":")) {
+				// divde tokens at the colon and put them into the hashmaps
+				String key = currToken.substring(0, currToken.indexOf(":"));
+				String value = currToken.substring(currToken.indexOf(":") + 1);
+				KV.put(key, value);
+			} 
+		}
+		if(KV.get("codec") == null || KV.get("number") == null || KV.get("samplerate") == null || KV.get("framesize") == null){
+			throw new InvalidParameterException("Invalid config: " + config);
+		}
+		try{
+			CODEC_USER_NAME = KV.get("codec");
+			CODEC_FRAME_SIZE = Integer.parseInt(KV.get("framesize"));
+			CODEC_SAMPLE_RATE= Integer.parseInt(KV.get("samplerate"));
+			CODEC_NUMBER= Integer.parseInt(KV.get("number"));
+		}
+		catch(Exception e){
+			throw new InvalidParameterException("Invalid config: " + config);
+		}
+	};
+	
+	public String getConfigString(){
+		return "codec:"+userName()+";"+"number:"+number()+";"+"samplerate:"+samp_rate()+";"+"framesize:"+frame_size()+";";
 	}
 }

@@ -186,8 +186,9 @@ public class RtpStreamReceiver extends Thread {
 		// if speakermode is not MODE_IN_CALL
 		if(mode != AudioManager.MODE_IN_CALL && p_type.codec.samp_rate() > 44100){
 			AlertDialog.Builder alert = new AlertDialog.Builder(Receiver.mContext);
-			
-    		alert.setTitle("Could not enable speaker").setMessage("Routing the output to the speaker is only possible at sampling rates of 44.1 kHz or below");
+			;
+    		alert.setTitle(R.string.error_speaker_title)
+    		.setMessage(R.string.error_speaker_description);
     		
     		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
     		public void onClick(DialogInterface dialog, int whichButton) {
@@ -711,15 +712,8 @@ public class RtpStreamReceiver extends Thread {
 						 codec = p_type.codec.getTitle();
 					 }
 					 len = p_type.codec.decode(buffer, lin, rtp_packet.getPayloadLength());
-					  
-					// get vu levels
-					short sample;
-			        short peak=0;
-			        for(int i=0; i < lin.length; i++){
-				        sample = (short) Math.abs(lin[i]);
-				        if(sample > peak) peak = sample;
-			        }
-			        CallCard.updateOutputVU((int)(20.0*Math.log10(peak/32767.0)));
+					 
+			        CallCard.updateOutputVU(RtpStreamSender.getVULevel(lin));
 					 
 					// Call recording: Save incoming.
 					 // Data is in buffer lin, from 0 to len.

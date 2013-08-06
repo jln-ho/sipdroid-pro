@@ -22,9 +22,13 @@
 package org.sipdroid.sipua.ui;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.sipdroid.codecs.AAC;
+import org.sipdroid.codecs.Codec;
 import org.sipdroid.codecs.Codecs;
 import org.sipdroid.codecs.Opus;
 import org.sipdroid.sipua.R;
@@ -50,6 +54,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CallLog.Calls;
 import android.provider.Contacts.People;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,6 +68,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.Filterable;
@@ -74,7 +80,7 @@ import android.widget.AdapterView.OnItemClickListener;
 // for modifying it additional terms according to section 7, GPL apply
 // see ADDITIONAL_TERMS.txt
 /////////////////////////////////////////////////////////////////////
-public class Sipdroid extends Activity implements OnDismissListener {
+public class Sipdroid extends Activity implements OnCodecSelectionListener, OnDismissListener {
 
 	public static final boolean release = true;
 	public static final boolean market = false;
@@ -101,6 +107,7 @@ public class Sipdroid extends Activity implements OnDismissListener {
 	private static AlertDialog m_AlertDlg;
 	AutoCompleteTextView sip_uri_box,sip_uri_box2;
 	Button createButton;
+	Codec presetCodec = null;
 	
 	@Override
 	public void onStart() {
@@ -245,16 +252,17 @@ public class Sipdroid extends Activity implements OnDismissListener {
 		on(this,true);
 		
 		//added by Julian Howes
+		final OnCodecSelectionListener l = this;
 		((Button)findViewById(R.id.btn_aac_settings)).setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
-				new AACSettingsDialog(v.getContext()).show();
+				new AACSettingsDialog(v.getContext(), l).show();
 			}
 		});
 		((Button)findViewById(R.id.btn_opus_settings)).setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
-				new OpusSettingsDialog(v.getContext()).show();
+				new OpusSettingsDialog(v.getContext(), l).show();
 			}
 		});
 		
@@ -419,7 +427,50 @@ public class Sipdroid extends Activity implements OnDismissListener {
 
 	void call_menu(AutoCompleteTextView view)
 	{
-		String target = view.getText().toString();
+		final String target = view.getText().toString().replace("sip:", "");
+		SharedPreferences sharedPrefs = getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
+		Set<String> keys = sharedPrefs.getAll().keySet();
+		for(String key : keys){
+			key = key.replace("sip:", "");
+			if((key.startsWith("preset:") && target.equals(key.substring("preset:".length())))){
+				String presetConfig = sharedPrefs.getString(key, "");
+				presetCodec = Codecs.getCodecByConfig(presetConfig);
+				if(presetCodec != null){
+					String msg = getResources().getString(R.string.codec_dialog_codec) + presetCodec.name()+"\n" +
+								getResources().getString(R.string.codec_dialog_samplerate) + presetCodec.samp_rate()/1000+" kHz\n";
+					if(presetCodec instanceof AAC){
+						msg += getResources().getString(R.string.codec_dialog_bitrate) + ((AAC)presetCodec).getBitrate()/1000 +" kBit/s\n";
+					}
+					if(presetCodec instanceof Opus){
+						msg += getResources().getString(R.string.codec_dialog_profile) + ((Opus)presetCodec).getMode().toString();
+					}
+					AlertDialog.Builder alert = new AlertDialog.Builder(this);
+					alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							Codecs.configurePreset(presetCodec);
+							do_call(target);
+						}
+					});
+					alert.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							do_call(target);
+						}
+					});
+					alert.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							dialog.dismiss();
+						}
+					});
+					alert.setTitle(target).setMessage(getResources().getString(R.string.codec_dialog_use) + msg);
+		    		alert.show();
+				}
+				return;
+			}
+		}
+		do_call(target);
+	}
+	
+	private void do_call(String target){
 		if (m_AlertDlg != null) 
 		{
 			m_AlertDlg.cancel();
@@ -508,5 +559,24 @@ public class Sipdroid extends Activity implements OnDismissListener {
 	@Override
 	public void onDismiss(DialogInterface dialog) {
 		onResume();
+	}
+
+	@Override
+	public void onCodecSelected(Codec c) {
+		if(c != null && !c.isFailed()){
+			if(c instanceof AAC){
+				SharedPreferences sharedPrefs = getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
+				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_AAC_BITRATE, ((AAC)c).getBitrate()).commit();
+				sharedPrefs.edit().putString(Sipdroid.ADDITIONAL_PREF_AAC_PROFILE, ((AAC)c).getConfig()).commit();
+			}
+			else if(c instanceof Opus){
+				SharedPreferences sharedPrefs = getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
+				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_FSIZE, ((Opus)c).getFrameSizeMsInt()).commit();
+				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_MODE, ((Opus)c).getModeInt()).commit();
+				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_SRATE, ((Opus)c).samp_rate()).commit();
+			}
+			Codecs.put(c);
+			Toast.makeText(this, "settings applied", Toast.LENGTH_SHORT).show();
+		}
 	}
 }

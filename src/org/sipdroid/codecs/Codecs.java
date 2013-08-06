@@ -20,7 +20,10 @@
 
 package org.sipdroid.codecs;
 
+import java.security.InvalidParameterException;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -49,6 +52,7 @@ import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class Codecs {
+		private static Vector<Codec> backedUpCodecs = new Vector<Codec>();
     	private static final Vector<Codec> codecs = new Vector<Codec>() {{
 			add(new Opus());		//added by Julian Howes
 			add(new AAC());
@@ -64,15 +68,18 @@ public class Codecs {
 		}};
 	private static final HashMap<Integer, Codec> codecsNumbers;
 	private static final HashMap<String, Codec> codecsNames;
+	private static final HashMap<String, Codec> codecsPTnames;
 
 	static {
 		final int size = codecs.size();
 		codecsNumbers = new HashMap<Integer, Codec>(size);
 		codecsNames = new HashMap<String, Codec>(size);
+		codecsPTnames = new HashMap<String, Codec>(size);
 
 		for (Codec c : codecs) {
 			codecsNames.put(c.name(), c);
 			codecsNumbers.put(c.number(), c);
+			codecsPTnames.put(c.userName(), c);
 		}
 
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(Receiver.mContext);
@@ -118,7 +125,7 @@ public class Codecs {
 				if(codecByName instanceof AAC){
 					((AAC)codecByName).setProfile(((AAC)c).getConfig(), ((AAC) c).getBitrate());
 				}
-				if(codecByName instanceof Opus){
+				else if(codecByName instanceof Opus){
 					((Opus)codecByName).setFrameSize(((Opus) c).getFrameSizeMs());
 					((Opus)codecByName).setMode(((Opus) c).getMode());
 					((Opus)codecByName).setSampleRate(((Opus) c).samp_rate());
@@ -132,7 +139,7 @@ public class Codecs {
 				if(codecByNumber instanceof AAC){
 					((AAC)codecByNumber).setProfile(((AAC)c).getConfig(), ((AAC) c).getBitrate());
 				}
-				if(codecByNumber instanceof Opus){
+				else if(codecByNumber instanceof Opus){
 					((Opus)codecByNumber).setFrameSize(((Opus) c).getFrameSizeMs());
 					((Opus)codecByNumber).setMode(((Opus) c).getMode());
 					((Opus)codecByNumber).setSampleRate(((Opus) c).samp_rate());
@@ -148,7 +155,7 @@ public class Codecs {
 					updated = true;
 					break;
 				}
-				if(oldCodec instanceof Opus && c instanceof Opus){
+				else if(oldCodec instanceof Opus && c instanceof Opus){
 					((Opus)oldCodec).setFrameSize(((Opus) c).getFrameSizeMs());
 					((Opus)oldCodec).setMode(((Opus) c).getMode());
 					((Opus)oldCodec).setSampleRate(((Opus) c).samp_rate());
@@ -157,7 +164,7 @@ public class Codecs {
 				}
 			}
 			if(!updated){
-				codecs.add(c);
+				codecs.add(0, c);
 			}
 		}
 		else{
@@ -183,6 +190,64 @@ public class Codecs {
 				codecs.add(c);
 			}
 		}
+	}
+	
+	//added by Julian Howes
+	public static void configurePreset(Codec codec){
+		for(Codec c : codecs){
+			backedUpCodecs.add(c);
+		}
+		codecs.clear();
+		codecsNames.clear();
+		codecsNumbers.clear();
+		codecs.add(codec);
+		codecsNames.put(codec.name(), codec);
+		codecsNumbers.put(codec.number(), codec);
+	}
+	
+	public static void revert(){
+		if(backedUpCodecs.size() > 0){
+			codecs.clear();
+			codecsNames.clear();
+			codecsNumbers.clear();
+		}
+		for(Codec codec : backedUpCodecs){
+			codecs.add(codec);
+			codecsNames.put(codec.name(), codec);
+			codecsNumbers.put(codec.number(), codec);
+		}
+		backedUpCodecs.clear();
+	}
+	
+	public static Codec getCodecByConfig(String config){
+		String codec = config.substring("codec:".length(), config.indexOf(";"));
+		Codec c = codecsPTnames.get(codec);
+		Codec newCodec = null;
+		//TODO: abstraction
+		if(c instanceof AAC){
+			newCodec = new AAC();
+		}
+		else if(c instanceof Opus){
+			newCodec = new Opus();
+		}
+		else if(c instanceof G722){
+			newCodec = new G722();
+		}
+		else if(c instanceof alaw){
+			newCodec = new alaw();
+		}
+		if (codec == null || newCodec == null){
+			Log.d("configurePreset()", "ERROR: invalid preset string " + config);
+			return null;
+		}
+		try{
+			newCodec.configureFromString(config);
+		}
+		catch(InvalidParameterException e){
+			e.printStackTrace();
+			return null;
+		}
+		return newCodec;
 	}
 
 	public static Codec get(int key) {

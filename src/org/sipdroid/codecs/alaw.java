@@ -20,13 +20,13 @@
 package org.sipdroid.codecs;
 
 
-class alaw extends CodecBase implements Codec {
-	alaw() {
+public class alaw extends CodecBase implements Codec {
+	public alaw() {
 		CODEC_NAME = "PCMA";
 		CODEC_USER_NAME = "PCMA";
 		CODEC_DESCRIPTION = "64kbit";
 		CODEC_NUMBER = 8;
-		CODEC_DEFAULT_SETTING = "wlanor3g";
+		CODEC_DEFAULT_SETTING = "always";
 
 		load();
 	}

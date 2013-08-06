@@ -21,6 +21,7 @@ package org.sipdroid.codecs;
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -72,6 +73,7 @@ public class AAC extends CodecBase implements Codec {
 			this.eldSBR = eldSBR;
 			if(this.aot == AOT_AAC_ELD && eldSBR){
 				this.frameSize = 1024;
+				this.name += " (SBR)";
 			}
 		}
 	}
@@ -291,5 +293,26 @@ public class AAC extends CodecBase implements Codec {
 		if(CODEC_SAMPLE_RATE % 1000 != 0) f = new DecimalFormat("#0.0");
 		else f = new DecimalFormat("#0");
 		CODEC_DESCRIPTION = CODEC_BITRATE / 1000 + " kbit/s | "+f.format(CODEC_SAMPLE_RATE/1000.0)+" kHz";
+	}
+	
+	@Override
+	public void configureFromString(String config) throws InvalidParameterException{
+		super.configureFromString(config);
+		try{
+			String cfg = KV.get("config");
+			int bitrate = Integer.parseInt(KV.get("bitrate"));
+			if(cfg == null){
+				throw new InvalidParameterException("Invalid config: " + config);
+			}
+			setProfile(cfg, bitrate);
+		}
+		catch(Exception e){
+			throw new InvalidParameterException("Invalid config: " + config);
+		}
+	}
+	
+	@Override
+	public String getConfigString(){
+		return super.getConfigString()+"config:"+getConfig()+";"+"bitrate:"+getBitrate(); 
 	}
 }

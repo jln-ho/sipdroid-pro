@@ -131,6 +131,13 @@
 				android:title="@string/settings_callrecord"
 				android:summary="@string/settings_callrecord2" />
 	</PreferenceScreen>
+	<PreferenceScreen
+        android:key="preset"
+        android:title="@string/codec_presets" >
+        <intent android:action="org.sipdroid.sipua.ui.PresetEditor"
+            android:targetPackage="org.sipdroid.sipua"
+        	android:targetClass="org.sipdroid.sipua.ui.PresetEditor" /> 
+    </PreferenceScreen>
 	<PreferenceScreen android:title="@string/settings_notifications">
 			<CheckBoxPreference
 				android:key="MWI_enabled"

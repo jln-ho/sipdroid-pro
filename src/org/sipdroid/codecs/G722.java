@@ -21,7 +21,7 @@ package org.sipdroid.codecs;
 
 import org.sipdroid.sipua.ui.Sipdroid;
 
-class G722 extends CodecBase implements Codec {
+public class G722 extends CodecBase implements Codec {
 
 	/*
 		Acceptable values for bitrate are
@@ -29,12 +29,12 @@ class G722 extends CodecBase implements Codec {
  	 */
 	private static final int DEFAULT_BITRATE = 64000;
 
-	G722() {
+	public G722() {
 		CODEC_NAME = "G722 HD Voice";
 		CODEC_USER_NAME = "G722";
 		CODEC_DESCRIPTION = "64kbit";
 		CODEC_NUMBER = 9;
-		CODEC_DEFAULT_SETTING = "wlanor3g";
+		CODEC_DEFAULT_SETTING = "always";
 		CODEC_SAMPLE_RATE = 16000;
 		CODEC_FRAME_SIZE = 320;		
 		super.update();

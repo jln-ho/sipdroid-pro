@@ -19,6 +19,7 @@
  */
 package org.sipdroid.codecs;
 
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 
 import org.sipdroid.media.RtpStreamSender;
@@ -74,11 +75,11 @@ public class Opus extends CodecBase implements Codec {
 	
 	private int CODEC_NUMBER_OVERRIDE = 0;
 	
-	Opus() {
+	public Opus() {
 		CODEC_NAME = "Opus";
 		CODEC_USER_NAME = "opus";
 		CODEC_NUMBER = 107;
-		CODEC_DEFAULT_SETTING = "wlanor3g";
+		CODEC_DEFAULT_SETTING = "always";
 		if(RtpStreamSender.isSupportedSampRate(SAMPLING_RATE_48)){
 			setSampleRate(SAMPLING_RATE_48);
 		}
@@ -108,7 +109,7 @@ public class Opus extends CodecBase implements Codec {
 	}
 	
 	private void updateDescription(){
-		CODEC_DESCRIPTION = CODEC_SAMPLE_RATE / 1000 + " kHz | fsize: "+getFrameSizeSamples()+" | mode: " + currMode.toString();
+		CODEC_DESCRIPTION = CODEC_SAMPLE_RATE / 1000 + " kHz | "+getFrameSizeMsInt()+" ms | mode: " + currMode.toString();
 	}
 	
 	public void setMode(Mode mode){
@@ -150,6 +151,10 @@ public class Opus extends CodecBase implements Codec {
 	
 	public int getFrameSizeMsInt(){
 		return (int) (Math.ceil(OPUS_FRAME_SIZES_MS.get(currFrameSizeMs)*1000));
+	}
+	
+	private void setFrameSizeFromSamples(int numSamples){
+		
 	}
 	
 	public static boolean isSupportedFrameSize(int frameSize){
@@ -225,7 +230,6 @@ public class Opus extends CodecBase implements Codec {
 		} catch (Throwable e) {
 			if (!Sipdroid.release) e.printStackTrace();
 		}
-    
 	}  
 	
 	public void init() {
@@ -277,4 +281,22 @@ public class Opus extends CodecBase implements Codec {
 	public native int decode(byte encoded[], short lin[], int size);
 	public native int encode(short lin[], int offset, byte encoded[], int size);
 	public native void cleanup();
+	
+	@Override
+	public void configureFromString(String config) throws InvalidParameterException{
+		super.configureFromString(config);
+		try{
+			currMode = getMode(Integer.parseInt(KV.get("mode")));
+			setFrameSize(CODEC_FRAME_SIZE);
+			setSampleRate(CODEC_SAMPLE_RATE);
+		}
+		catch(Exception e){
+			throw new InvalidParameterException("Invalid config: " + config);
+		}
+	}
+	
+	@Override
+	public String getConfigString(){
+		return super.getConfigString()+"mode:"+getModeInt();
+	}
 }

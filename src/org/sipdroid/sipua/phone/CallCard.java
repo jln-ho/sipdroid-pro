@@ -188,7 +188,7 @@ public class CallCard extends FrameLayout
     public static void updateInputVU(int value){
     	if(vuMeters != null && vuMeters.getVisibility() == VISIBLE){
     		if(!RtpStreamSender.isAudioPlay() && RtpStreamSender.isMuteMic()){
-        		vuInput.setProgress(0);
+        		value = vuInput.getMax() * -1;
         	}
         	vuInput.setProgress(vuInput.getMax()+value);
     	}	

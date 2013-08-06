@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="PROFILE "
+                android:text="@string/profile"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="FRAME LENGTH "
+                android:text="@string/frame_length"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <Spinner
@@ -109,13 +109,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="50dp"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/btn_aac_apply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Apply" />
+            android:text="@string/apply" />
     </LinearLayout>
 
 </LinearLayout>

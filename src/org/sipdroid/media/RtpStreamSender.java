@@ -567,15 +567,8 @@ public class RtpStreamSender extends Thread {
 					}
 				}
 			}
-			 
-			// get vu levels
-			short sample;
-	        short peak=0;
-	        for(int i=0; i < lin.length; i++){
-		        sample = (short) Math.abs(lin[i]);
-		        if(sample > peak) peak = sample;
-	        }
-	        CallCard.updateInputVU((int)(20.0*Math.log10(peak/32767.0)));
+			
+	        CallCard.updateInputVU(getVULevel(lin));
 
 			 if (RtpStreamReceiver.speakermode == AudioManager.MODE_NORMAL) {
  				 calc(lin,pos,num);
@@ -709,6 +702,16 @@ public class RtpStreamSender extends Thread {
 	//DTMF change
 
 	//added by Julian Howes
+	protected static int getVULevel(short[] frame){
+		short sample;
+        short peak=0;
+        for(int i=0; i < frame.length; i++){
+	        sample = (short) Math.abs(frame[i]);
+	        if(sample > peak) peak = sample;
+        }
+        return (int)(20.0*Math.log10(peak/32767.0));
+	}
+	
 	public static boolean isSupportedSampRate(int sampRate){
 		int min = AudioRecord.getMinBufferSize(sampRate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
 		return min != AudioRecord.ERROR && min != AudioRecord.ERROR_BAD_VALUE;
