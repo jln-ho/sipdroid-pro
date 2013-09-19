@@ -48,7 +48,7 @@ Before using Sipdroid, you should first read the FAQ in the [sipdroid wiki](http
   
   For AAC, one can choose between 4 profiles (AAC-LC, HE-AAC, AAC-LD and AAC-ELD), 4 bitrates from 24 kbit/s to 64 kbit/s and 3 sampling rates: 32, 44.1 and 48 kHz.
   
-  For Opus, one can choose between 3 profiles (AUDIO, VOIP and LOW-DELAY), 3 frame sizes (20ms, 40ms and 60ms) and 5 sampling rates from 8 to 48 kHz.
+  For Opus, one can choose between 3 profiles (AUDIO, VOIP and LOW-DELAY), 3 frame sizes (20ms, 40ms and 60ms) and 5 sampling rates from 8 to 48 kHz. Inband FEC (forward-error-correction) can be enabled (for increased robustness to packet-loss) or disabled (for decreased delay/complexity).
   
 * **Placing calls**
   
