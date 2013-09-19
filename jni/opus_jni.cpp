@@ -45,11 +45,17 @@ int frame_size = 0;
 int max_bitrate = 0;
 int fec_flag = 1;
 int dtx_flag = 1;
-int cbr_flag = 0;
+int vbr_flag = 1;
+int seq_prev = -1;
 
 pthread_mutex_t enc_lock;
 pthread_mutex_t dec_lock;
 bool mutexes_initialized = false;
+
+// buffer for the previously received packet (used for FEC)
+unsigned char* dec_in_buf_prev = 0;
+int size_prev;
+bool lost_prev = false;
 
 extern "C"
 JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
@@ -65,7 +71,7 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 		&& max_bitrate == maxbrate
 		&& ((fec && fec_flag == 1) || (!fec && fec_flag == 0))
 		&& ((dtx && dtx_flag == 1) || (!dtx && dtx_flag == 0))
-		&& ((cbr && cbr_flag == 1) || (!cbr && cbr_flag == 0))
+		&& ((cbr && vbr_flag == 0) || (!cbr && cbr_flag == 1))
 		&& enc != 0 && dec != 0 ){
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "opus already open. returning.");
 		return 0;
@@ -90,7 +96,7 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 	enc_mode = mode;
 	frame_size = framesize;
 	max_bitrate = maxbrate;
-	if(cbr) cbr_flag = 1; else cbr_flag = 0;
+	if(cbr) vbr_flag = 0; else cbr_flag = 1;
 	if(dtx) dtx_flag = 1; else dtx_flag = 0;
 	if(fec) fec_flag = 1; else fec_flag = 0;
 
@@ -105,15 +111,13 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 	}
 
 	opus_encoder_ctl(enc, OPUS_SET_INBAND_FEC(fec_flag));
-
-	if(cbr_flag){
-		opus_encoder_ctl(enc, OPUS_SET_VBR(0));
-	}
-	else{
-		opus_encoder_ctl(enc, OPUS_SET_VBR(1));
+	if(fec_flag){
+		opus_encoder_ctl(enc, OPUS_SET_PACKET_LOSS_PERC(5));
 	}
 
-	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "encoder opened successfully");
+	opus_encoder_ctl(enc, OPUS_SET_VBR(vbr_flag));
+
+	__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "encoder opened successfully. fec: %d", fec_flag);
 
 	// initialize decoder
 	dec = opus_decoder_create(samp_rate, 1, &error);
@@ -154,12 +158,30 @@ extern "C"
 JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_decode
     (JNIEnv *env, jobject obj, jbyteArray encoded, jshortArray lin, jint size) {
 	int out_samples = 0;
+	bool lost = false;
+	// get sequence number from packet (3rd and 4th byte in RTP header)
+	unsigned char* seq_nr_buf = (unsigned char*) malloc(2);
+	env->GetByteArrayRegion(encoded, 2, 2, (jbyte*) seq_nr_buf);
+	short seq_nr = (short) seq_nr_buf[0] << 8 | seq_nr_buf[1];
+	// detect packet loss
+	if(seq_prev >= 0 && seq_nr - seq_prev > 1){
+		lost = true;
+		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "PACKET LOSS!! %d", seq_nr);
+	}
+	seq_prev = seq_nr;
 	pthread_mutex_lock(&dec_lock);
 	if(dec != NULL){
 		unsigned char* dec_in_buf = (unsigned char*) malloc(size);
 		env->GetByteArrayRegion(encoded, RTP_HDR_SIZE, size, (jbyte*) dec_in_buf);
 		opus_int16* dec_out_buf = (opus_int16*) malloc(sizeof(opus_int16*)*MAX_OUT_SAMPLES);
-		out_samples = opus_decode(dec, dec_in_buf, size, dec_out_buf, MAX_OUT_SAMPLES, 0);
+		if(lost_prev){
+			int output_size_prev;
+			opus_decoder_ctl(dec, OPUS_GET_LAST_PACKET_DURATION(&output_size_prev));
+			out_samples = opus_decode(dec, dec_in_buf, size, dec_out_buf, output_size_prev, 1);
+		}
+		else if(dec_in_buf_prev){
+			out_samples = opus_decode(dec, dec_in_buf_prev, size_prev, dec_out_buf, MAX_OUT_SAMPLES, 0);
+		}
 		if(out_samples <= 0){
 			__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "error decoding frame. code %d", out_samples);
 			out_samples = 0;
@@ -167,8 +189,13 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_decode
 		else{
 			env->SetShortArrayRegion(lin, 0, out_samples, dec_out_buf);
 		}
-		free(dec_in_buf);
+		if(dec_in_buf_prev){
+			free(dec_in_buf_prev);
+		}
+		dec_in_buf_prev = dec_in_buf;
+		size_prev = size;
 		free(dec_out_buf);
+		lost_prev = lost;
 	}
 	pthread_mutex_unlock(&dec_lock);
 	return out_samples;

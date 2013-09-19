@@ -93,7 +93,7 @@ public class RtpStreamReceiver extends Thread {
 	static String codec = "";
 
 	/** Size of the read buffer */
-	public static final int BUFFER_SIZE = 4096;
+	public static final int BUFFER_SIZE = 5760;
 
 	/** Maximum blocking time, spent waiting for reading new bytes [milliseconds] */
 	public static final int SO_TIMEOUT = 1000;

@@ -69,7 +69,7 @@ public class Opus extends CodecBase implements Codec {
 	private Mode currMode = Mode.AUDIO;
 	private FrameSizeMs currFrameSizeMs = FrameSizeMs.TWENTY_MS;
 	private int maxBitRate = 0;
-	private boolean fec = true;
+	private boolean fec = false;
 	private boolean dtx = false;
 	private boolean cbr = false;
 	
@@ -104,12 +104,27 @@ public class Opus extends CodecBase implements Codec {
 		setSampleRate(sampleRate);
 	}
 	
+	
+	public Opus(Mode mode, FrameSizeMs frameSize, int sampleRate, boolean fec){
+		this(mode, frameSize, sampleRate);
+		this.fec = fec;
+	}
+	
+	
+	public Opus(Mode mode, FrameSizeMs frameSize, int sampleRate, boolean fec, boolean dtx, boolean cbr){
+		this(mode, frameSize, sampleRate);
+		this.fec = fec;
+		this.dtx = dtx;
+		this.cbr = cbr;
+	}
+
 	public Opus(Opus other){
-		this(other.currMode, other.currFrameSizeMs, other.CODEC_SAMPLE_RATE);
+		this(other.currMode, other.currFrameSizeMs, other.CODEC_SAMPLE_RATE, other.fec, other.cbr, other.dtx);
 	}
 	
 	private void updateDescription(){
 		CODEC_DESCRIPTION = CODEC_SAMPLE_RATE / 1000 + " kHz | "+getFrameSizeMsInt()+" ms | mode: " + currMode.toString();
+		if(fec) CODEC_DESCRIPTION += " | FEC";
 	}
 	
 	public void setMode(Mode mode){
@@ -192,6 +207,7 @@ public class Opus extends CodecBase implements Codec {
 	
 	public void setFEC(boolean fec){
 		this.fec = fec;
+		updateDescription();
 	}
 	
 	public int getFEC(){
@@ -287,6 +303,7 @@ public class Opus extends CodecBase implements Codec {
 		super.configureFromString(config);
 		try{
 			currMode = getMode(Integer.parseInt(KV.get("mode")));
+			setFEC(Integer.parseInt(KV.get("fec")) == 1);
 			setFrameSize(CODEC_FRAME_SIZE);
 			setSampleRate(CODEC_SAMPLE_RATE);
 		}
@@ -297,6 +314,15 @@ public class Opus extends CodecBase implements Codec {
 	
 	@Override
 	public String getConfigString(){
-		return super.getConfigString()+"mode:"+getModeInt();
+		return super.getConfigString()+"mode:"+getModeInt()+";fec:"+getFEC();
+	}
+	
+	public void copySettings(Opus other){
+		setFrameSize(other.getFrameSizeMs());
+		setMode(other.getMode());
+		setSampleRate(other.samp_rate());
+		setFEC(other.getFEC() == 1);
+		setDTX(other.getDTX() == 1);
+		setCBR(other.getCBR() == 1);
 	}
 }

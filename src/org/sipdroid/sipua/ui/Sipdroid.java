@@ -443,6 +443,9 @@ public class Sipdroid extends Activity implements OnCodecSelectionListener, OnDi
 					}
 					if(presetCodec instanceof Opus){
 						msg += getResources().getString(R.string.codec_dialog_profile) + ((Opus)presetCodec).getMode().toString();
+						if(((Opus)presetCodec).getFEC() == 1) {
+							msg += " (FEC)";
+						}
 					}
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
 					alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

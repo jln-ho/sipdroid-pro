@@ -238,7 +238,7 @@ public class UserAgent extends CallListenerAdapter {
 					afvec.add(new AttributeField("rtpmap", String.format("%d %s/%d", codec.number(), codec.userName(), 48000)));
 					afvec.add(new AttributeField("ptime", String.valueOf(((Opus) codec).getFrameSizeMsInt())));	
 					afvec.add(new AttributeField("maxptime", String.valueOf(Opus.getMaxFrameSizeMs())));
-					afvec.add(new AttributeField("fmtp", String.format("%d sprop-maxcapturerate=%d; minptime=20; useinbandfec=0; usedtx=0",codec.number(), codec.samp_rate())));
+					afvec.add(new AttributeField("fmtp", String.format("%d sprop-maxcapturerate=%d; minptime=20; useinbandfec=%d; usedtx=0",codec.number(), codec.samp_rate(), ((Opus)codec).getFEC())));
 				}
 				else{
 					if (codec.number() == 9)
@@ -259,7 +259,7 @@ public class UserAgent extends CallListenerAdapter {
 				afvec.add(new AttributeField("rtpmap", String.format("%d %s/%d", c.codec.number(), c.codec.userName(), 48000)));
 				afvec.add(new AttributeField("ptime", String.valueOf(((Opus) c.codec).getFrameSizeMsInt())));	
 				afvec.add(new AttributeField("maxptime", String.valueOf(Opus.getMaxFrameSizeMs())));
-				 afvec.add(new AttributeField("fmtp", String.format("%d sprop-maxcapturerate=%d; minptime=20; useinbandfec=0; usedtx=0",c.codec.number(), c.codec.samp_rate())));
+				 afvec.add(new AttributeField("fmtp", String.format("%d sprop-maxcapturerate=%d; minptime=20; useinbandfec=%d; usedtx=0",c.codec.number(), c.codec.samp_rate(), ((Opus)c.codec).getFEC())));
 			}
 			else{
 				if (c.codec.number() == 9)

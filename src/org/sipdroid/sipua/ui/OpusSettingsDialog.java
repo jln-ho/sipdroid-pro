@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ public class OpusSettingsDialog extends Dialog {
 	private Spinner sp_opus_profile;
 	private Spinner sp_opus_framelength;
 	private Spinner sp_opus_samprate;
+	private CheckBox cb_opus_fec;
 	 
 	public OpusSettingsDialog(final Context context, final OnCodecSelectionListener listener) {
 		super(context);
@@ -32,6 +34,7 @@ public class OpusSettingsDialog extends Dialog {
 		sp_opus_profile = (Spinner) findViewById(R.id.sp_opus_profile);
 		sp_opus_framelength = (Spinner) findViewById(R.id.sp_opus_framelength);
 		sp_opus_samprate = (Spinner) findViewById(R.id.sp_opus_samprate);
+		cb_opus_fec = (CheckBox) findViewById(R.id.cb_opus_fec);
 		 
 		// initialize views according to the current configuration
 		setCurrentValues();
@@ -46,9 +49,10 @@ public class OpusSettingsDialog extends Dialog {
 						opus.setFrameSize(getSelectedFrameLength());
 						opus.setMode(getSelectedProfile());
 						opus.setSampleRate(getSelectedSampRate());
+						opus.setFEC(cb_opus_fec.isChecked());
 					}
 					else{
-						opus = new Opus(getSelectedProfile(), getSelectedFrameLength(), getSelectedSampRate());
+						opus = new Opus(getSelectedProfile(), getSelectedFrameLength(), getSelectedSampRate(), cb_opus_fec.isChecked());
 					}
 					opus.init();
 					if(!opus.isFailed()){
@@ -100,6 +104,7 @@ public class OpusSettingsDialog extends Dialog {
 			case LOW_DELAY: sp_opus_profile.setSelection(2); break;
 			default: sp_opus_profile.setSelection(0);
 		}
+		cb_opus_fec.setChecked(opus.getFEC() == 1);
 	}
 	
 	private int getSelectedSampRate(){

@@ -45,6 +45,7 @@ class CodecBase implements Preference.OnPreferenceChangeListener {
 	private boolean enabled = false;
 	private boolean wlanOnly = false,wlanOr3GOnly = false;
 	private String value;
+	private boolean forced = false;
 	
 	protected Hashtable<String, String> KV = new Hashtable<String, String>();
 
@@ -55,13 +56,20 @@ class CodecBase implements Preference.OnPreferenceChangeListener {
 		}
 		if (Receiver.mContext != null) {
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(Receiver.mContext);
-			value = sp.getString(key(), CODEC_DEFAULT_SETTING);
+			if(!forced){
+				value = sp.getString(key(), CODEC_DEFAULT_SETTING);
+			}
+			else{
+				value = "always";
+			}
 			updateFlags(value);
 		}
 	}
 	
 	public void force(){
 		value = "always";
+		enable(true);
+		forced = true;
 		updateFlags(value);
 	}
 	
@@ -184,7 +192,7 @@ class CodecBase implements Preference.OnPreferenceChangeListener {
 		}
 	}
 
-	public String toString() {
+	public String toString() { 
 		return "CODEC{ " + CODEC_NUMBER + ": " + getTitle() + "}";
 	}
 	

@@ -154,6 +154,9 @@ public class PresetEditor extends Activity implements OnCodecSelectionListener {
 		}
 		if (c instanceof Opus) {
 			msg += getResources().getString(R.string.codec_dialog_profile) + ((Opus) c).getMode().toString();
+			if(((Opus)c).getFEC() == 1){
+				msg += " (FEC)";
+			}
 		}
 		final Activity context = this;
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);

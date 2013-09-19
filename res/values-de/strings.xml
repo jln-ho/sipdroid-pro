@@ -225,7 +225,7 @@
 <string name="help_speakerphone">Sie können die Lautstärkeregler als Sprechtaste verwenden</string>
 
 
-<string name="browse_button">Datei auswählen</string>
+<string name="browse_button">Datei...</string>
 <string name="play_button">Play</string>
 <string name="open_title">Datei öffnen</string>
 <string name="open_button">Ok</string>

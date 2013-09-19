@@ -126,9 +126,7 @@ public class Codecs {
 					((AAC)codecByName).setProfile(((AAC)c).getConfig(), ((AAC) c).getBitrate());
 				}
 				else if(codecByName instanceof Opus){
-					((Opus)codecByName).setFrameSize(((Opus) c).getFrameSizeMs());
-					((Opus)codecByName).setMode(((Opus) c).getMode());
-					((Opus)codecByName).setSampleRate(((Opus) c).samp_rate());
+					((Opus) codecByName).copySettings((Opus)c);
 				}
 			}
 			else{
@@ -140,9 +138,7 @@ public class Codecs {
 					((AAC)codecByNumber).setProfile(((AAC)c).getConfig(), ((AAC) c).getBitrate());
 				}
 				else if(codecByNumber instanceof Opus){
-					((Opus)codecByNumber).setFrameSize(((Opus) c).getFrameSizeMs());
-					((Opus)codecByNumber).setMode(((Opus) c).getMode());
-					((Opus)codecByNumber).setSampleRate(((Opus) c).samp_rate());
+					((Opus) codecByNumber).copySettings((Opus)c);
 				}
 			}
 			else{
@@ -156,9 +152,7 @@ public class Codecs {
 					break;
 				}
 				else if(oldCodec instanceof Opus && c instanceof Opus){
-					((Opus)oldCodec).setFrameSize(((Opus) c).getFrameSizeMs());
-					((Opus)oldCodec).setMode(((Opus) c).getMode());
-					((Opus)oldCodec).setSampleRate(((Opus) c).samp_rate());
+					((Opus) oldCodec).copySettings((Opus)c);
 					updated = true;
 					break;
 				}
@@ -200,6 +194,7 @@ public class Codecs {
 		codecs.clear();
 		codecsNames.clear();
 		codecsNumbers.clear();
+		codec.force();
 		codecs.add(codec);
 		codecsNames.put(codec.name(), codec);
 		codecsNumbers.put(codec.number(), codec);
@@ -228,7 +223,7 @@ public class Codecs {
 			newCodec = new AAC();
 		}
 		else if(c instanceof Opus){
-			newCodec = new Opus();
+			newCodec = new Opus(); 
 		}
 		else if(c instanceof G722){
 			newCodec = new G722();
@@ -315,7 +310,7 @@ public class Codecs {
 
 	public static int[] getCodecs() {
 		Vector<Integer> v = new Vector<Integer>(codecs.size());
-
+		
 		for (Codec c : codecs) {
 			c.update();
 			if (!c.isValid())

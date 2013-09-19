@@ -31,6 +31,7 @@ import java.util.Arrays;
 
 import org.sipdroid.codecs.Codecs;
 import org.sipdroid.codecs.G711;
+import org.sipdroid.codecs.Opus;
 import org.sipdroid.media.file.AudioFile;
 import org.sipdroid.media.file.AudioFileInformations.FileType;
 import org.sipdroid.media.file.Mp3File;
@@ -438,7 +439,6 @@ public class RtpStreamSender extends Thread {
 		setMuteMic(false);
 		
 		RtpPacket last_packet = null;
-		
 		while (running) {
 			 if (changed || record == null) {
 				if (record != null) {
@@ -621,7 +621,9 @@ public class RtpStreamSender extends Thread {
  			 if (RtpStreamReceiver.timeout == 0 || Receiver.on_wlan || now-lastsent > 500)
 	 			 try {
 	 				 lastsent = now;
-	 				 rtp_socket.send(rtp_packet);
+	 				 //if(seqn % 50 != 0){
+	 					 rtp_socket.send(rtp_packet); 
+	 				 //}
 	 				 if(packetDuplication){
 	 					 if(interleaving){
 	 						 if(last_packet != null){
