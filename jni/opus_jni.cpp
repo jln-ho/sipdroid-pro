@@ -71,7 +71,7 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 		&& max_bitrate == maxbrate
 		&& ((fec && fec_flag == 1) || (!fec && fec_flag == 0))
 		&& ((dtx && dtx_flag == 1) || (!dtx && dtx_flag == 0))
-		&& ((cbr && vbr_flag == 0) || (!cbr && cbr_flag == 1))
+		&& ((cbr && vbr_flag == 0) || (!cbr && vbr_flag == 1))
 		&& enc != 0 && dec != 0 ){
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_ENCODER, "opus already open. returning.");
 		return 0;
@@ -96,7 +96,7 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_open
 	enc_mode = mode;
 	frame_size = framesize;
 	max_bitrate = maxbrate;
-	if(cbr) vbr_flag = 0; else cbr_flag = 1;
+	if(cbr) vbr_flag = 0; else vbr_flag = 1;
 	if(dtx) dtx_flag = 1; else dtx_flag = 0;
 	if(fec) fec_flag = 1; else fec_flag = 0;
 
