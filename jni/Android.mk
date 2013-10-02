@@ -423,7 +423,7 @@ LOCAL_CFLAGS += -DHAVE_LRINTF
 #CFLAGS := -Dinline= $(CFLAGS)
 #LOCAL_CFLAGS := -Drestrict= $(CFLAGS)
 
-OPUS_VERSION := "1.0.2"
+OPUS_VERSION := "1.0.3"
 LOCAL_CFLAGS += -DOPUS_VERSION='$(OPUS_VERSION)'
 WARNINGS := -Wall -W -Wstrict-prototypes -Wextra -Wcast-align -Wnested-externs -Wshadow
 LOCAL_CFLAGS += -O2 -g $(WARNINGS) -DOPUS_BUILD

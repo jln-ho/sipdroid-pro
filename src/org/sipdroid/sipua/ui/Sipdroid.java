@@ -96,13 +96,8 @@ public class Sipdroid extends Activity implements OnCodecSelectionListener, OnDi
 	// keys for addition shared preferences
 	public static final String ADDITIONAL_PREF_PACKET_DUPLICATION = "duplication";
 	public static final String ADDITIONAL_PREF_PACKET_INTERLEAVING = "interleaving";
-	
-	public static final String ADDITIONAL_PREF_AAC_PROFILE ="aac_profile";
-	public static final String ADDITIONAL_PREF_AAC_BITRATE ="aac_bitrate";
-	
-	public static final String ADDITIONAL_PREF_OPUS_MODE ="opus_profile";
-	public static final String ADDITIONAL_PREF_OPUS_FSIZE ="opus_fsize";
-	public static final String ADDITIONAL_PREF_OPUS_SRATE ="opus_srate";
+	public static final String ADDITIONAL_PREF_AAC_CONFIG = "aac_config";
+	public static final String ADDITIONAL_PREF_OPUS_CONFIG = "opus_config";
 
 	private static AlertDialog m_AlertDlg;
 	AutoCompleteTextView sip_uri_box,sip_uri_box2;
@@ -402,13 +397,14 @@ public class Sipdroid extends Activity implements OnCodecSelectionListener, OnDi
 		((CheckBox) findViewById(R.id.cb_interleaving)).setChecked(sharedPrefs.getBoolean(ADDITIONAL_PREF_PACKET_INTERLEAVING, false));
 		((CheckBox) findViewById(R.id.cb_interleaving)).setEnabled(((CheckBox) findViewById(R.id.cb_packet_duplication)).isChecked());
 
-		Codecs.put(new AAC(sharedPrefs.getString(ADDITIONAL_PREF_AAC_PROFILE, "1288"), sharedPrefs.getInt(ADDITIONAL_PREF_AAC_BITRATE, 64000)));
-		
-		int opus_srate = sharedPrefs.getInt(ADDITIONAL_PREF_OPUS_SRATE, Opus.SAMPLING_RATE_16);
-		int opus_fsize = sharedPrefs.getInt(ADDITIONAL_PREF_OPUS_FSIZE, Opus.FRAME_SIZE_20);
-		int opus_mode = sharedPrefs.getInt(ADDITIONAL_PREF_OPUS_MODE, Opus.MODE_AUDIO);
-		
-		Codecs.put(new Opus(Opus.getMode(opus_mode), Opus.getFrameSize(opus_fsize), opus_srate));
+		String aacConfig = sharedPrefs.getString(ADDITIONAL_PREF_AAC_CONFIG, null);
+		if(aacConfig != null){
+			Codecs.put(Codecs.getCodecByConfig(aacConfig));
+		}
+		String opusConfig = sharedPrefs.getString(ADDITIONAL_PREF_OPUS_CONFIG, null);
+		if(opusConfig != null){
+			Codecs.put(Codecs.getCodecByConfig(opusConfig));
+		}
 	}
 
 	@Override
@@ -569,14 +565,11 @@ public class Sipdroid extends Activity implements OnCodecSelectionListener, OnDi
 		if(c != null && !c.isFailed()){
 			if(c instanceof AAC){
 				SharedPreferences sharedPrefs = getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
-				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_AAC_BITRATE, ((AAC)c).getBitrate()).commit();
-				sharedPrefs.edit().putString(Sipdroid.ADDITIONAL_PREF_AAC_PROFILE, ((AAC)c).getConfig()).commit();
+				sharedPrefs.edit().putString(ADDITIONAL_PREF_AAC_CONFIG, c.getConfigString()).commit();
 			}
 			else if(c instanceof Opus){
 				SharedPreferences sharedPrefs = getSharedPreferences(Sipdroid.ADDITIONAL_PREFS, Context.MODE_PRIVATE);
-				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_FSIZE, ((Opus)c).getFrameSizeMsInt()).commit();
-				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_MODE, ((Opus)c).getModeInt()).commit();
-				sharedPrefs.edit().putInt(Sipdroid.ADDITIONAL_PREF_OPUS_SRATE, ((Opus)c).samp_rate()).commit();
+				sharedPrefs.edit().putString(ADDITIONAL_PREF_OPUS_CONFIG, c.getConfigString()).commit();
 			}
 			Codecs.put(c);
 			Toast.makeText(this, "settings applied", Toast.LENGTH_SHORT).show();

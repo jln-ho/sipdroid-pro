@@ -621,9 +621,9 @@ public class RtpStreamSender extends Thread {
  			 if (RtpStreamReceiver.timeout == 0 || Receiver.on_wlan || now-lastsent > 500)
 	 			 try {
 	 				 lastsent = now;
-	 				 //if(seqn % 50 != 0){
+	 				 //if(seqn % 2 != 0){
 	 					 rtp_socket.send(rtp_packet); 
-	 				 //}
+	 				// }
 	 				 if(packetDuplication){
 	 					 if(interleaving){
 	 						 if(last_packet != null){
