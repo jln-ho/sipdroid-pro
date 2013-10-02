@@ -5,7 +5,7 @@ A modified version of Sipdroid v2.9 with support for AAC and Opus as well as fil
 
 AAC support was implemented using the [Fraunhofer FDK AAC library](http://www.iis.fraunhofer.de/en/bf/amm/implementierungen/fdkaaccodec.html)
 
-Opus support was implemented using [libopus v1.0.1](http://www.opus-codec.org)
+Opus support was implemented using [libopus v1.0.3](http://www.opus-codec.org)
 
 The basis for the file streaming extension was taken from [extended-sipdroid](https://github.com/codevise/extended-sipdroid) and was further extended to support .wav, .aac and .mp4 files in addition to .mp3 files.
 This extension can be accessed through the newly added _file controls_ button above the in-call dialpad
