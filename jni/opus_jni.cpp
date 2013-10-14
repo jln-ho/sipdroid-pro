@@ -170,6 +170,7 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_Opus_decode
 			unsigned char* seq_nr_buf = (unsigned char*) malloc(2);
 			env->GetByteArrayRegion(encoded, 2, 2, (jbyte*) seq_nr_buf);
 			short seq_nr = (short) seq_nr_buf[0] << 8 | seq_nr_buf[1];
+			free(seq_nr_buf);
 			// detect packet loss
 			if(seq_prev >= 0 && seq_nr - seq_prev > 1){
 				lost = true;
