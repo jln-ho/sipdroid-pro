@@ -186,7 +186,6 @@ public class RtpStreamReceiver extends Thread {
 		// if speakermode is not MODE_IN_CALL
 		if(mode != AudioManager.MODE_IN_CALL && p_type.codec.samp_rate() > 44100){
 			AlertDialog.Builder alert = new AlertDialog.Builder(Receiver.mContext);
-			;
     		alert.setTitle(R.string.error_speaker_title)
     		.setMessage(R.string.error_speaker_description);
     		
@@ -507,12 +506,17 @@ public class RtpStreamReceiver extends Thread {
 			maxjitter = AudioTrack.getMinBufferSize(p_type.codec.samp_rate(), 
 					AudioFormat.CHANNEL_CONFIGURATION_MONO, 
 					AudioFormat.ENCODING_PCM_16BIT);
-			if (maxjitter < 2*2*BUFFER_SIZE*3*mu)
-				maxjitter = 2*2*BUFFER_SIZE*3*mu;
+			
+			int bufferscale = android.os.Build.VERSION.SDK_INT < 19 ? 4 : 2;
+			
+			if (maxjitter < bufferscale*BUFFER_SIZE*3*mu)
+				maxjitter = bufferscale*BUFFER_SIZE*3*mu;
 			oldtrack = track;
+			
 			track = new AudioTrack(stream(), p_type.codec.samp_rate(), AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
 					maxjitter*2, AudioTrack.MODE_STREAM);
-			maxjitter /= 2*2;
+			
+			maxjitter /= bufferscale;
 			minjitter = minjitteradjust = 500*mu;
 			jitter = 875*mu;
 			devheadroom = Math.pow(jitter/5, 2);

@@ -490,12 +490,15 @@ import org.zoolu.sip.provider.SipProvider;
 				state = laststate;
 				number = lastnumber;
 			}
-			Intent intent = new Intent(ACTION_PHONE_STATE_CHANGED);
-			intent.putExtra("state",state);
-			if (number != null)
-				intent.putExtra("incoming_number", number);
-			intent.putExtra(mContext.getString(R.string.app_name), true);
-			mContext.sendBroadcast(intent, android.Manifest.permission.READ_PHONE_STATE);
+			if (android.os.Build.VERSION.SDK_INT < 19) {
+				Intent intent = new Intent(ACTION_PHONE_STATE_CHANGED);
+				intent.putExtra("state",state);
+				if (number != null)
+					intent.putExtra("incoming_number", number);
+				intent.putExtra(mContext.getString(R.string.app_name), true);
+				mContext.sendBroadcast(intent, android.Manifest.permission.READ_PHONE_STATE);
+				Log.e("PHONE STATE", "change");
+			}
 			if (state.equals("IDLE")) {
 				if (was_playing) {
 					if (pstn_state == null || pstn_state.equals("IDLE"))
