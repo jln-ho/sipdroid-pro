@@ -37,6 +37,7 @@ import org.sipdroid.sipua.ui.Settings;
 import org.sipdroid.sipua.ui.Sipdroid;
 import org.zoolu.net.IpAddress;
 import org.zoolu.sdp.AttributeField;
+import org.zoolu.sdp.BandwidthInformationField;
 import org.zoolu.sdp.ConnectionField;
 import org.zoolu.sdp.MediaDescriptor;
 import org.zoolu.sdp.MediaField;
@@ -191,11 +192,11 @@ public class UserAgent extends CallListenerAdapter {
 			addMediaDescriptor("audio", user_profile.audio_port, c);
 		}
 		
-		if (user_profile.video)
+		/*if (user_profile.video)
 		{
 			addMediaDescriptor("video", user_profile.video_port,
 					user_profile.video_avp, "h263-1998", 90000);
-		}
+		}*/
 	}
 	//change end
 	
@@ -233,6 +234,7 @@ public class UserAgent extends CallListenerAdapter {
 				if(codec instanceof AAC){ //modified by Julian Howes
 					afvec.add(new AttributeField("rtpmap", String.format("%d %s/%d/1", codec.number(), codec.userName(), codec.samp_rate())));
 					afvec.add(new AttributeField("fmtp", String.format("%d streamtype=5; profile-level-id=41; mode=AAC-hbr; config=%s; sizeLength=13; indexLength=3; indexDeltaLength=3; constantDuration=%d; bitrate=%d",codec.number(), ((AAC)codec).getConfig(), codec.frame_size(), ((AAC)codec).getBitrate())));
+					sdp.setBandWidthInformation(new BandwidthInformationField("TIAS:"+String.valueOf(((AAC) codec).getBitrate())));
 				}
 				else if(codec instanceof Opus){
 					afvec.add(new AttributeField("rtpmap", String.format("%d %s/%d", codec.number(), codec.userName(), 48000)));
@@ -254,6 +256,7 @@ public class UserAgent extends CallListenerAdapter {
 			if(c.codec instanceof AAC){ // modified by Julian Howes
 				afvec.add(new AttributeField("rtpmap", String.format("%d %s/%d/1", c.codec.number(), c.codec.userName(), c.codec.samp_rate())));
 				afvec.add(new AttributeField("fmtp", String.format("%d streamtype=5; profile-level-id=41; mode=AAC-hbr; config=%s; sizeLength=13; indexLength=3; indexDeltaLength=3; constantDuration=%d; bitrate=%d",c.codec.number(), ((AAC)c.codec).getConfig(), c.codec.frame_size(), ((AAC)c.codec).getBitrate())));
+				sdp.setBandWidthInformation(new BandwidthInformationField("TIAS:"+String.valueOf(((AAC) c.codec).getBitrate())));
 			}
 			else if(c.codec instanceof Opus){
 				afvec.add(new AttributeField("rtpmap", String.format("%d %s/%d", c.codec.number(), c.codec.userName(), 48000)));
@@ -1053,3 +1056,4 @@ public class UserAgent extends CallListenerAdapter {
 	}
 
 }
+

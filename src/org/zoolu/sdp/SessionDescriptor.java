@@ -29,6 +29,8 @@ import java.util.Vector;
 
 import org.zoolu.net.IpAddress;
 
+import android.util.Log;
+
 /* HSC CHANGE STARTS */
 // import java.util.Enumeration;
 // PersonalJava
@@ -66,6 +68,8 @@ public class SessionDescriptor {
 	ConnectionField c;
 	/** Time filed. */
 	TimeField t;
+	
+	private BandwidthInformationField b;
 
 	/** Vector of session attributes (as Vector of SdpFields). */
 	/* HSC CHANGE STARTS */
@@ -502,6 +506,11 @@ public class SessionDescriptor {
 		}
 		return v;
 	}
+	
+	public SessionDescriptor setBandWidthInformation(BandwidthInformationField b){
+		this.b = b;
+		return this;
+	}
 
 	/** Gets a String rapresentation */
 	public String toString() {
@@ -516,11 +525,15 @@ public class SessionDescriptor {
 			sb.append(c.toString());
 		if (t != null)
 			sb.append(t.toString());
+		if(b != null)
+			sb.append(b.toString());
 		for (int i = 0; i < av.size(); i++)
 			sb.append(((AttributeField) av.elementAt(i)).toString());
 		for (int i = 0; i < media.size(); i++)
 			sb.append(((MediaDescriptor) media.elementAt(i)).toString());
+		Log.e("SDP", sb.toString());
 		return sb.toString();
 	}
 
 }
+

@@ -274,6 +274,11 @@ JNIEXPORT jint JNICALL Java_org_sipdroid_codecs_AAC_encode (JNIEnv *env, jobject
 			enc_au_header[2] = (jbyte) ((au_size << 3) >> 8);
 			// last 5 of 13 bits for AU-size + 3 bits for AU-Index (always 0, see RFC 3640)
 			enc_au_header[3] = (jbyte) ((au_size << 11) >> 8);
+			//set marker bit
+			jbyte hdr_byte;
+			env->GetByteArrayRegion(encoded, 1, 1, &hdr_byte);
+			hdr_byte |= 0x80;
+			env->SetByteArrayRegion(encoded, 1, 1, &hdr_byte);
 			// write AU header
 			env->SetByteArrayRegion(encoded, RTP_HDR_SIZE, AU_HDR_SIZE, enc_au_header);
 			// write AU (frame)
@@ -348,3 +353,4 @@ JNIEXPORT void JNICALL Java_org_sipdroid_codecs_AAC_close
 		__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG_DECODER, "cleanup complete");
 	}
 }
+

@@ -407,6 +407,11 @@ public class RtpStreamSender extends Thread {
 				if (frame_size == 1024) frame_size *= 2;
 			}
 		}
+		else if(min < 4096){
+			// opus and aac require a 4KB buffer to work correctly
+			min = 4096;
+		}
+		
 		frame_rate = p_type.codec.samp_rate()/frame_size;
 		long frame_period = 1000 / frame_rate;
 		frame_rate *= 1.5;
@@ -735,3 +740,4 @@ public class RtpStreamSender extends Thread {
 		interleaving = value;
 	}
 }
+
