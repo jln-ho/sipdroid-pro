@@ -18,11 +18,13 @@ Other libraries used:
 Installation from source
 ============
 
-* Before deploying Sipdroid pro, make sure to download and install ffmpeg for Android using [`jni/ffmpeg/FFmpeg-Android.sh`](https://github.com/juho0006/sipdroid-pro/blob/master/jni/ffmpeg/FFmpeg-Android.sh) 
-Copy the resulting `ffmpeg.so` to `jni/ffmpeg/lib` and to `libs/` in your project's root directory.
-
-* Compile the remaining native libs with the Android NDK and make sure they are in `libs/` aswell.
-* Deploy
+0. Install git, Android ndk
+1. `$ export ANDROID_NDK=/path/to/your/android-ndk`
+2. `$ ./jni/ffmpeg/FFmpeg-Android.sh`
+3. libffmpeg.so will be built to `jni/ffmpeg/build/ffmpeg/{neon,armv7,vfp,armv6}/`
+4. Depending on the target architecture, copy the corresponding `libffmpeg.so` to `jni/ffmpeg/lib` and to `libs/` in your project's root directory.
+5. Compile the remaining native libs with the Android NDK and make sure they are in `libs/` aswell.
+6. Deploy
 
 Usage
 ============
