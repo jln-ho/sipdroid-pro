@@ -1,83 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <title>Sipdroid Pro by jln-ho</title>
 
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <title>Sipdroid-pro by jln-ho</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>Sipdroid-pro</h1>
-        <h2>A modified version of Sipdroid v2.9 with support for AAC and Opus as well as file streaming (wav / aac / mp4 / mp3) and packet duplication / interleaving</h2>
-        <a href="https://github.com/jln-ho/sipdroid-pro" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+    <div class="wrapper">
+      <header>
+        <h1>Sipdroid Pro</h1>
+        <p>Sipdroid v2.9 with various features for professional use</p>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+        <p class="view"><a href="https://github.com/jln-ho/sipdroid-pro">View the Project on GitHub <small>jln-ho/sipdroid-pro</small></a></p>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+        <ul>
+          <li><a href="https://github.com/jln-ho/sipdroid-pro/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/jln-ho/sipdroid-pro/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/jln-ho/sipdroid-pro">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>A modified version of Sipdroid v2.9 with support for AAC and Opus as well as file streaming (wav / aac / mp4 / mp3) and packet duplication / interleaving</p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>AAC support was implemented using the <a href="http://www.iis.fraunhofer.de/en/bf/amm/implementierungen/fdkaaccodec.html">Fraunhofer FDK AAC library</a></p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<p>Opus support was implemented using <a href="http://www.opus-codec.org">libopus v1.0.3</a></p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>The basis for the file streaming extension was taken from <a href="https://github.com/codevise/extended-sipdroid">extended-sipdroid</a> and was further extended to support .wav, .aac and .mp4 files in addition to .mp3 files.
+This extension can be accessed through the newly added <em>file controls</em> button above the in-call dialpad</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<p>Other libraries used:</p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<ul>
+<li>
+<a href="http://www.mega-nerd.com/SRC/">libsamplerate</a> for PCM/WAV resampling</li>
+<li>
+<a href="http://www.ffmpeg.org/">ffmpeg</a> for decoding .mp4 files</li>
+<li>
+<a href="http://mpg123.org">mpg123</a> for decoding .mp3 files</li>
+</ul><h1>
+<a name="installation-from-source" class="anchor" href="#installation-from-source"><span class="octicon octicon-link"></span></a>Installation from source</h1>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<ol>
+<li>Install git, Android ndk</li>
+<li><code>$ export ANDROID_NDK=/path/to/your/android-ndk</code></li>
+<li><code>$ ./jni/ffmpeg/FFmpeg-Android.sh</code></li>
+<li>libffmpeg.so will be built to <code>jni/ffmpeg/build/ffmpeg/{neon,armv7,vfp,armv6}/</code>
+</li>
+<li>Depending on the target architecture, copy the corresponding <code>libffmpeg.so</code> to <code>jni/ffmpeg/lib</code> and to <code>libs/</code> in your project's root directory.</li>
+<li>Compile the remaining native libs with the Android NDK and make sure they are in <code>libs/</code> aswell.</li>
+<li>Deploy</li>
+</ol><h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Before using Sipdroid, you should first read the FAQ in the <a href="http://code.google.com/p/sipdroid/wiki/FAQ">sipdroid wiki</a></p>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<ul>
+<li>
+<p><strong>Adding a SIP account</strong></p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-        </section>
+<p>In order to place or receive calls with Sipdroid, you must first enter your SIP account's credentials under <em>Settings &gt; Sip Account (Line1 or Line2)</em>.
+Remember to check <em>Use WLAN</em> and/or <em>Use 3G</em>. </p>
 
-        <aside id="sidebar">
-          <a href="https://github.com/jln-ho/sipdroid-pro/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/jln-ho/sipdroid-pro/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+<p>Once Sipdroid has successfully signed into an account, a small green icon will appear in the Android statusbar.
+Sipdroid can sign into two SIP accounts at the same time. The account entered in <em>Line1</em> will be the preferred one by default. This means that outgoing calls will be placed using this account, while incoming calls to both accounts can be received. </p>
 
-          <p class="repo-owner"><a href="https://github.com/jln-ho/sipdroid-pro"></a> is maintained by <a href="https://github.com/jln-ho">jln-ho</a>.</p>
+<p>The preferred account can be changed by pulling down the Android statusbar and touching the desired account.</p>
+</li>
+<li>
+<p><strong>Setting up the codecs</strong></p>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+<p>Sipdroid-pro supports 4 main codecs: AAC, Opus, G.722 and G.711 (PCMA).
+If and when a certain codec shall be used can be defined under <em>Settings &gt; Audio Codecs</em>.</p>
+
+<p>The G.722 and G.711 codecs only have one mode : 64 kbit/s at 16 kHz (G.722) or 8 kHz (G.711).
+AAC and Opus are more versatile, so each has their own settings menu which can be accessed from the main Sipdroid dialing screen. From here one can set a range of codec-specific parameters for the next outgoing call. </p>
+
+<p>For AAC, one can choose between 4 profiles (AAC-LC, HE-AAC, AAC-LD and AAC-ELD), 4 bitrates from 24 kbit/s to 64 kbit/s and 3 sampling rates: 32, 44.1 and 48 kHz.</p>
+
+<p>For Opus, one can choose between 3 profiles (AUDIO, VOIP and LOW-DELAY), 3 frame sizes (20ms, 40ms and 60ms) and 5 sampling rates from 8 to 48 kHz. Inband FEC (forward-error-correction) can be enabled (for increased robustness to packet-loss) or disabled (for decreased delay/complexity).</p>
+</li>
+<li>
+<p><strong>Placing calls</strong></p>
+
+<p>To place a call, simply enter the callee's phone number or SIP URI in the corresponding text field of the dialling screen and press <em>send</em>. Enabling packet duplication and/or interleaving improves the stability of the stream while doubling the required data rates.</p>
+
+<p>In order to call certain contacts with a specific codec regardless of the current codec configuration, one can set up a preset under <em>Settings &gt; Codec Presets</em>.</p>
+</li>
+<li>
+<p><strong>Streaming audio files</strong></p>
+
+<p>To stream an audio file during a call, open up the dialpad by pulling up the small tab at the bottom of the screen. Then select <em>file controls</em>. Here, one can select a file from the android device's internal storage. </p>
+
+<p>Supported file types are .wav (16 bit, mono/stereo), .mp3, .aac and .m4a. </p>
+
+<p>Once play is pressed, the stream is initiated and the microphone is automatically muted. It can be re-enabled, though, in order to 'talk over the stream'. One can also monitor both the incoming and the outgoing stream at the same time by selecting <em>wiretap</em> and adjusting the slider below. To prevent clipping/distortion the outgoing stream's output volume can be adjusted with the top slider. </p>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/jln-ho">jln-ho</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-
-  
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
